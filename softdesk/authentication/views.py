@@ -8,4 +8,3 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     """ ViewSet for viewing and editing user """
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
-

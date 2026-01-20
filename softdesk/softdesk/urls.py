@@ -21,7 +21,7 @@ from rest_framework import routers
 from authentication.views import CustomUserViewSet
 
 router = routers.DefaultRouter()
-router.register(r'users', CustomUserViewSet)
+router.register(r'users', CustomUserViewSet, basename='user')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
