@@ -1,3 +1,12 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-# Create your models here.
+
+class CustomUser(AbstractUser):
+    """ Custom user model """
+    age = models.IntegerField(default=0)
+    can_be_contacted = models.BooleanField(default=False)
+    can_data_be_shared = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.username
