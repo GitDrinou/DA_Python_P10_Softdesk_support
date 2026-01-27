@@ -27,7 +27,7 @@ router = routers.DefaultRouter()
 router.register(r'users', CustomUserViewSet, basename='user')
 router.register(r'projects', ProjectViewSet, basename='project')
 router.register(r'projects/(?P<project_id>\d+)/contributors',
-                ProjectContributorViewSet, basename='project-contributors')
+                ProjectContributorViewSet, basename='project-contributor')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
