@@ -1,8 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from authentication.serializers import CustomUserSerializer
-from .models import Project, Contributor
+from .models import Project
 
 User = get_user_model()
 
@@ -10,6 +9,7 @@ User = get_user_model()
 class ProjectSerializer(serializers.ModelSerializer):
     """ Serializer for project model """
     author = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = Project
         fields = [
@@ -21,10 +21,3 @@ class ProjectSerializer(serializers.ModelSerializer):
             'created_time',
             'contributors'
         ]
-
-
-class ContributorSerializer(serializers.ModelSerializer):
-    """ Serializer for contributor model """
-    class Meta:
-        model = Contributor
-        fields = '__all__'

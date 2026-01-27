@@ -11,7 +11,7 @@ class ProjectsApiTest(APITestCase):
     def setUp(self):
         self.list_url = reverse('project-list')
         self.user1 = CustomUser.objects.create_user(
-           username="test-user",
+            username="test-user",
             password="pass123",
             first_name="Test",
             last_name="User",
