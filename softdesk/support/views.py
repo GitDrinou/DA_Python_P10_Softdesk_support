@@ -1,13 +1,29 @@
+from rest_framework import permissions
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 
 from .models import Project, Contributor
 from .serializers import ProjectSerializer, ContributorSerializer
+
+class IsAuthor(permissions.BasePermission):
+    """Allows access only to authors"""
+    def has_object_permission(self, request, view, obj):
+        return obj.author == request.user
 
 
 class ProjectViewSet(ModelViewSet):
     """ ViewSet for viewing and editing project """
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        """ Return permissions based on action """
+        if self.action in ['update', 'partial_update', 'destroy']:
+            permission_classes = [IsAuthor]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
         """ Create a new project with author as automatically a contributor"""
