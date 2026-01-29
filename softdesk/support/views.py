@@ -6,13 +6,13 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from authentication.serializers import CustomUserSerializer
-from .models import Project
-from .serializers import ProjectSerializer
+from .models import Project, Issue, Comment
+from .serializers import ProjectSerializer, IssueSerializer, CommentSerializer
 
 User = get_user_model()
 
 
-class IsAuthor(permissions.BasePermission):
+class IsAuthorOrContributor(permissions.BasePermission):
     """Allows access only to authors"""
     def has_object_permission(self, request, view, obj):
         return obj.author == request.user
@@ -41,7 +41,7 @@ class ProjectViewSet(ModelViewSet):
     def get_permissions(self):
         """ Return permissions based on action """
         if self.action in ['update', 'partial_update', 'destroy']:
-            permission_classes = [IsAuthor]
+            permission_classes = [IsAuthorOrContributor]
         else:
             permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
@@ -82,3 +82,64 @@ class ProjectContributorViewSet(ModelViewSet):
         user = get_object_or_404(User, id=kwargs['pk'])
         project.contributors.remove(user)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class IssueViewSet(ModelViewSet):
+    """ ViewSet for viewing and editing issue """
+    serializer_class = IssueSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        """ Return permissions based on action """
+        if self.action in ['update', 'partial_update', 'destroy']:
+            permission_classes = [IsAuthorOrContributor]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+
+    def get_queryset(self):
+        """ Restrict the queryset based on action """
+        return Issue.objects.filter(project__contributors=self.request.user)
+
+    def perform_create(self, serializer):
+        """ Create a new issue with an author automatically"""
+        project = serializer.validated_data['project']
+        if self.request.user not in project.contributors.all():
+            raise permissions.exceptions.PermissionDenied("You are not a "
+                                                          "contributor to "
+                                                          "this project.")
+        serializer.save(author=self.request.user)
+
+
+class CommentViewSet(ModelViewSet):
+    """ ViewSet for viewing and editing comment """
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        """ Return permissions based on action """
+        if self.action in ['update', 'partial_update', 'destroy']:
+            permission_classes = [IsAuthorOrContributor]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+
+    def get_queryset(self):
+        """ Restrict the queryset based on action """
+        project_id = self.kwargs.get('project_id')
+        issue_id = self.kwargs.get('issue_id')
+        return Comment.objects.filter(
+            issue__id=issue_id,
+            issue__project__id=project_id,
+            issue__project__contributors=self.request.user
+        )
+
+    def perform_create(self, serializer):
+        """ Create a new comment with author as automatically """
+        issue_id = self.kwargs.get('issue_id')
+        issue = get_object_or_404(Issue, id=issue_id)
+        if self.request.user not in issue.project.contributors.all():
+            raise permissions.exceptions.PermissionDenied("You are not a "
+                                                          "contributor to "
+                                                          "this project.")
+        serializer.save(author=self.request.user, issue=issue)

@@ -21,13 +21,19 @@ from rest_framework_simplejwt.views import TokenObtainPairView, \
     TokenRefreshView
 
 from authentication.views import CustomUserViewSet
-from support.views import ProjectViewSet, ProjectContributorViewSet
+from support.views import ProjectViewSet, ProjectContributorViewSet, \
+    IssueViewSet, CommentViewSet
 
 router = routers.DefaultRouter()
 router.register(r'users', CustomUserViewSet, basename='user')
 router.register(r'projects', ProjectViewSet, basename='project')
 router.register(r'projects/(?P<project_id>\d+)/contributors',
                 ProjectContributorViewSet, basename='project-contributor')
+router.register(r'projects/(?P<project_id>\d+)/issues',
+                IssueViewSet, basename='project-issue')
+router.register(r'projects/(?P<project_id>\d+)/issues/('
+                r'?P<issue_id>\d+)/comments', CommentViewSet,
+                basename='project-issue-comment')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

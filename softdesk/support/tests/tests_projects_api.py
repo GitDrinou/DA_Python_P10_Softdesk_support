@@ -1,23 +1,24 @@
+from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase
 from django.urls import reverse
 from rest_framework import status
-
-from authentication.models import CustomUser
 from ..models import Project
+
+User = get_user_model()
 
 
 class ProjectsApiTest(APITestCase):
     """ Tests for api action for project"""
     def setUp(self):
         self.list_url = reverse('project-list')
-        self.user1 = CustomUser.objects.create_user(
+        self.user1 = User.objects.create(
             username="test-user",
             password="pass123",
             first_name="Test",
             last_name="User",
             age=25
         )
-        self.user2 = CustomUser.objects.create_user(
+        self.user2 = User.objects.create(
             username="test-user2",
             password="pass123",
             first_name="Test",
