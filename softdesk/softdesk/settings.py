@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'authentication',
     'support',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -134,11 +135,13 @@ AUTH_USER_MODEL = 'authentication.CustomUser'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 SIMPLE_JWT = {
@@ -146,4 +149,22 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKEN': False,
     'BLACKLIST_AFTER_ROTATION': True,
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'SoftDesk Support API',
+    'DESCRIPTION': 'Interactive documentation',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SECURITY': [{"bearerAuth": []}],
+    'COMPONENTS': {
+        'securitySchemes': {
+            'bearerAuth': {
+                'type': 'apiKey',
+                'scheme': 'bearer',
+                'bearerFormat': 'JWT',
+            }
+        }
+    },
 }

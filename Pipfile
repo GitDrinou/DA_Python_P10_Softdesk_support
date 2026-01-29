@@ -11,6 +11,7 @@ automium-web = "*"
 authentication = "*"
 djangorestframework-simplejwt = "*"
 uuid = "*"
+drf-spectacular = "*"
 
 [dev-packages]
 flake8 = "*"
