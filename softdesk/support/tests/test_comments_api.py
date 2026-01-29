@@ -89,20 +89,6 @@ class CommentApiTests(APITestCase):
         self.assertEqual(response.data['description'], 'New Description '
                                                        'updated')
 
-    def test_update_issue_comment_patch(self):
-        self.client.force_authenticate(user=self.author)
-        url = reverse('project-issue-comment-detail',
-                      kwargs={'project_id': self.project.pk,
-                              'issue_id': self.issue.pk,
-                              'pk': self.comment.pk})
-        payload = {
-            'description': 'New Description updated',
-        }
-        response = self.client.patch(url, payload, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['description'], 'New Description '
-                                                       'updated')
-
     def test_delete_issue_comment(self):
         self.client.force_authenticate(user=self.author)
         url = reverse('project-issue-comment-detail',

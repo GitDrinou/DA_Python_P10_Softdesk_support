@@ -29,11 +29,27 @@ Before starting, make sure you have installed:
 
 ## Running the API
 Start the server: `python manage.py runserver`
+
+The API will be available at: http://127.0.0.1:8000/
 ## Running test
 To run all unit tests: `python manage.py test`
 
-## Testing the API with Postman
-[TODO]
+## Authentication
+The API uses JWT (Json Web Token) authentication.
+
+All protected routes require an: `Authorization Bearer Token`
+
+Main endpoint:
+- `POST /api/token`: to get an access token
+- `POST /api/token/refresh`: refresh token
+
+## API Testing with Postman
+The API can be manually tested with Postman.
+
+Below are examples of common requests to verify authentication, permissions, 
+and core features.
+
+[TODO Documentation]
 
 ## Code style and linting
 This project follows the PEP8 coding style and uses flake8 as a linting tool 
