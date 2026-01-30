@@ -43,15 +43,16 @@ Main endpoint:
 - `POST /api/token`: to get an access token
 - `POST /api/token/refresh`: refresh token
 
-## API Testing with Postman
-The API can be manually tested with Postman.
+## API Testing
+The API can be manually tested with Swagger UI.
 
-Below are examples of common requests to verify authentication, permissions, 
-and core features.
+The interactive documentation displays the list of requests to verify 
+authentication, permissions, and core features.
 
-To access to the interactive documentation:
-1. connect to the admin applicaiton at http://127.0.0.1:8000/admin/
-2. then open the documentation at http://127.0.0.1:8000/api/docs/
+To access to the documentation:
+1. Launch the server on terminal `python manage.py runserver`
+2. connect to the admin application at http://127.0.0.1:8000/admin/
+3. open the documentation at http://127.0.0.1:8000/api/docs/
 
 ![Swagger UI](docs/screenshot-api-docs.jpg)
 
