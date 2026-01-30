@@ -85,9 +85,12 @@ The API can be manually tested with Swagger UI.
 The interactive documentation displays the list of requests to verify 
 authentication, permissions, and core features.
 
+If you don't have any account, you can create one on Postman, with the 
+required datas on a JSON body, with this endpoint: `POST /users/`
+
 To access to the documentation:
 1. Launch the server on terminal `python manage.py runserver`
-2. connect to the admin application at http://127.0.0.1:8000/api-auth/
+2. connect to the api at http://127.0.0.1:8000/api-auth/
 3. generate a token with the `POST /api-token` endpoint
 4. copy the 'access' value token on the response
 5. click on the top "Authorize" button and paste the token value at the 
