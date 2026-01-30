@@ -153,7 +153,9 @@ SIMPLE_JWT = {
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'SoftDesk Support API',
-    'DESCRIPTION': 'Interactive documentation',
+    'DESCRIPTION': 'This interactive documentation provides requests for '
+                   'managing projects, issues, comments in collaborative '
+                   'environment. Designed for SoftDesk Support.',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'COMPONENT_SPLIT_REQUEST': True,
@@ -168,3 +170,5 @@ SPECTACULAR_SETTINGS = {
         }
     },
 }
+
+LOGIN_REDIRECT_URL = '/api/docs'
