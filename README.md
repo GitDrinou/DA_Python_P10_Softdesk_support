@@ -87,7 +87,7 @@ authentication, permissions, and core features.
 
 To access to the documentation:
 1. Launch the server on terminal `python manage.py runserver`
-2. connect to the admin application at http://127.0.0.1:8000/api-auth/login/
+2. connect to the admin application at http://127.0.0.1:8000/api-auth/
 3. generate a token with the `POST /api-token` endpoint
 4. copy the 'access' value token on the response
 5. click on the top "Authorize" button and paste the token value at the 
