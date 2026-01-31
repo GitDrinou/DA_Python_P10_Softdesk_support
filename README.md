@@ -30,56 +30,53 @@ Before starting, make sure you have installed:
 3. Activate the virtual environment: `pipenv shell`
 4. Apply database migrations: `python manage.py migrate`
 
-## Running the API
+## Launch the API
 Start the server: `python manage.py runserver`
 
 The API will be available at: http://127.0.0.1:8000/
-## Running test
-To run all unit tests: `python manage.py test`
-
 ## Authentication
 The API uses JWT (Json Web Token) authentication.
 
 All protected routes require an: `Authorization Bearer Token`
 
-### Main endpoints
-#### Authentification
+## Main endpoints
+### Authentification
 - `POST /api/token`: get an access token
 - `POST /api/token/refresh`: refresh token
-#### Users
+### Users
 - `GET /users`: get the list of users
 - `GET /users/{id}`: get user detail
 - `POST /users`: add a new user
 - `PUT /users/{id}`: modify specific user datas
 - `PATCH /users/{id}`: modify specific user data
 - `DELETE /users/{id}`: delete a specific user
-#### Projects
+### Projects
 - `GET /projects`: get the list of projects
 - `GET /projects/{id}`: get project detail
 - `POST /projects`: add a new project
 - `PUT /projects/{id}`: modify specific project datas
 - `PATCH /projects/{id}`: modify specific project data
 - `DELETE /projects/{id}`: delete a specific project
-#### Contributors
+### Contributors
 - `GET /projects/{id}/contributors`: get the list of contributors
 - `GET /projects/{id}/contributors/{id}`: get contributor detail
 - `POST /projects{id}/contributors`: add a new contributor
 - `DELETE /projects/{id}/contributors/{id}`: delete a specific contributor 
-#### Issues
+### Issues
 - `GET /projects/{id/issues`: get the list of issues
 - `GET /projects/{id}/issues/{id}`: get issue detail
 - `POST /projects/{id}/issues`: add a new issue
 - `PUT /projects/{id}/issues/{id}`: modify specific issue datas
 - `PATCH /projects/{id}/issues/{id}`: modify specific issue data
 - `DELETE /projects/{id}/issues/{id}`: delete a specific issue
-#### Comments
+### Comments
 - `GET /projects/{id/issues/{id}/comments`: get the list of comments
 - `GET /projects/{id}/issues/{id}/comments/{id}`: get comment detail
 - `POST /projects/{id}/issues/{id}/comments`: add a new comment
 - `PUT /projects/{id}/issues/{id}/comments/{id}`: modify specific comment datas
 - `PATCH /projects/{id}/issues/{id}/comments/{id}`: modify specific comment data
 - `DELETE /projects/{id}/issues/{id}/comments/{id}`: delete a specific comment
-## API Testing
+## API Documentation
 The API can be manually tested with Swagger UI.
 
 The interactive documentation displays the list of requests to verify 
@@ -99,6 +96,8 @@ To access to the documentation:
 Now you can test the different endpoints with JWT.
 
 ![Swagger UI](docs/screenshot-api-docs.jpg)
+## Running unit tests
+To run all unit tests: `python manage.py test`
 
 ## Code style and linting
 This project follows the PEP8 coding style and uses flake8 as a linting tool 

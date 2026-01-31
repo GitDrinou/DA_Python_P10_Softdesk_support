@@ -135,8 +135,8 @@ AUTH_USER_MODEL = 'authentication.CustomUser'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -147,8 +147,7 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKEN': False,
-    'BLACKLIST_AFTER_ROTATION': True,
+    'ROTATE_REFRESH_TOKENS': False,
 }
 
 SPECTACULAR_SETTINGS = {
@@ -159,7 +158,7 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'COMPONENT_SPLIT_REQUEST': True,
-    'SECURITY': [{"bearerAuth": []}],
+    'SECURITY_REQUIREMENTS': [{"bearerAuth": []}],
     'COMPONENTS': {
         'securitySchemes': {
             'bearerAuth': {
@@ -171,4 +170,4 @@ SPECTACULAR_SETTINGS = {
     },
 }
 
-LOGIN_REDIRECT_URL = '/api/docs'
+LOGIN_REDIRECT_URL = '/api/docs/'

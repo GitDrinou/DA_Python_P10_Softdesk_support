@@ -41,7 +41,7 @@ class ProjectViewSet(ModelViewSet):
     def get_permissions(self):
         """ Return permissions based on action """
         if self.action in ['update', 'partial_update', 'destroy']:
-            permission_classes = [IsAuthorOrContributor]
+            permission_classes = [IsAuthenticated, IsAuthorOrContributor]
         else:
             permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
@@ -55,6 +55,8 @@ class ProjectViewSet(ModelViewSet):
 class ProjectContributorViewSet(ModelViewSet):
     """ ViewSet for viewing and editing project contributors """
     serializer_class = CustomUserSerializer
+    lookup_field = "pk"
+    lookup_value_regex = r"\d+"
 
     def get_queryset(self):
         """ Restrict the queryset based on project contributors """
@@ -64,7 +66,7 @@ class ProjectContributorViewSet(ModelViewSet):
     def get_permissions(self):
         """ Return permissions based on action """
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            permission_classes = [IsProjectAuthor]
+            permission_classes = [IsAuthenticated, IsProjectAuthor]
         else:
             permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
@@ -87,12 +89,13 @@ class ProjectContributorViewSet(ModelViewSet):
 class IssueViewSet(ModelViewSet):
     """ ViewSet for viewing and editing issue """
     serializer_class = IssueSerializer
-    permission_classes = [IsAuthenticated]
+    lookup_field = "pk"
+    lookup_value_regex = r"\d+"
 
     def get_permissions(self):
         """ Return permissions based on action """
         if self.action in ['update', 'partial_update', 'destroy']:
-            permission_classes = [IsAuthorOrContributor]
+            permission_classes = [IsAuthenticated, IsAuthorOrContributor]
         else:
             permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
@@ -114,12 +117,13 @@ class IssueViewSet(ModelViewSet):
 class CommentViewSet(ModelViewSet):
     """ ViewSet for viewing and editing comment """
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated]
+    lookup_field = "pk"
+    lookup_value_regex = r"\d+"
 
     def get_permissions(self):
         """ Return permissions based on action """
         if self.action in ['update', 'partial_update', 'destroy']:
-            permission_classes = [IsAuthorOrContributor]
+            permission_classes = [IsAuthenticated, IsAuthorOrContributor]
         else:
             permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
