@@ -33,67 +33,26 @@ Before starting, make sure you have installed:
 ## Launch the API
 Start the server: `python manage.py runserver`
 
-The API will be available at: http://127.0.0.1:8000/
 ## Authentication
 The API uses JWT (Json Web Token) authentication.
 
 All protected routes require an: `Authorization Bearer Token`
 
-## Main endpoints
-### Authentification
-- `POST /api/token`: get an access token
-- `POST /api/token/refresh`: refresh token
-### Users
-- `GET /users`: get the list of users
-- `GET /users/{id}`: get user detail
-- `POST /users`: add a new user
-- `PUT /users/{id}`: modify specific user datas
-- `PATCH /users/{id}`: modify specific user data
-- `DELETE /users/{id}`: delete a specific user
-### Projects
-- `GET /projects`: get the list of projects
-- `GET /projects/{id}`: get project detail
-- `POST /projects`: add a new project
-- `PUT /projects/{id}`: modify specific project datas
-- `PATCH /projects/{id}`: modify specific project data
-- `DELETE /projects/{id}`: delete a specific project
-### Contributors
-- `GET /projects/{id}/contributors`: get the list of contributors
-- `GET /projects/{id}/contributors/{id}`: get contributor detail
-- `POST /projects{id}/contributors`: add a new contributor
-- `DELETE /projects/{id}/contributors/{id}`: delete a specific contributor 
-### Issues
-- `GET /projects/{id/issues`: get the list of issues
-- `GET /projects/{id}/issues/{id}`: get issue detail
-- `POST /projects/{id}/issues`: add a new issue
-- `PUT /projects/{id}/issues/{id}`: modify specific issue datas
-- `PATCH /projects/{id}/issues/{id}`: modify specific issue data
-- `DELETE /projects/{id}/issues/{id}`: delete a specific issue
-### Comments
-- `GET /projects/{id/issues/{id}/comments`: get the list of comments
-- `GET /projects/{id}/issues/{id}/comments/{id}`: get comment detail
-- `POST /projects/{id}/issues/{id}/comments`: add a new comment
-- `PUT /projects/{id}/issues/{id}/comments/{id}`: modify specific comment datas
-- `PATCH /projects/{id}/issues/{id}/comments/{id}`: modify specific comment data
-- `DELETE /projects/{id}/issues/{id}/comments/{id}`: delete a specific comment
 ## API Documentation
 The API can be manually tested with Swagger UI.
 
 The interactive documentation displays the list of requests to verify 
 authentication, permissions, and core features.
 
-If you don't have any account, you can create one on Postman, with the 
-required datas on a JSON body, with this endpoint: `POST /users/`
-
 To access to the documentation:
 1. Launch the server on terminal `python manage.py runserver`
-2. connect to the api at http://127.0.0.1:8000/api-auth/
-3. generate a token with the `POST /api-token` endpoint
-4. copy the 'access' value token on the response
-5. click on the top "Authorize" button and paste the token value at the 
-   "jwtAuth (http, Bearer)" section and authorize.
+2. connect to the api at http://127.0.0.1:8000/
+3. go to the documentation at http://127.0.0.1:8000/api/docs/
+4. generate an access Token with your user credentials and copy-paste the 
+   token on the Bearer section when you click on the Authorize button at the 
+   top-right documentation page.
 
-Now you can test the different endpoints with JWT.
+Now you can test the different endpoints.
 
 ![Swagger UI](docs/screenshot-api-docs.jpg)
 ## Running unit tests
