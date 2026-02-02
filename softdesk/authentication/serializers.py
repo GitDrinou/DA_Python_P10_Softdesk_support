@@ -18,6 +18,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'can_data_be_shared',
             'password',
         ]
+        extra_kwargs = {
+            "age": {"required": True},
+        }
 
     def create(self, validated_data):
         """ Create and return a new user """
@@ -33,3 +36,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
         )
 
         return user
+
+    def validate_age(self, value):
+        """ Validate the user age to be more than 15 years old """
+        if value < 15:
+            raise serializers.ValidationError(
+                "You must be at least 15 years old to create an account"
+            )
+
+        return value
