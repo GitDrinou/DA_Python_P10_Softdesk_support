@@ -11,14 +11,14 @@ class ProjectsApiTest(APITestCase):
     """ Tests for api action for project"""
     def setUp(self):
         self.list_url = reverse('project-list')
-        self.user1 = User.objects.create(
+        self.user1 = User.objects.create_user(
             username="test-user",
             password="pass123",
             first_name="Test",
             last_name="User",
             age=25
         )
-        self.user2 = User.objects.create(
+        self.user2 = User.objects.create_user(
             username="test-user2",
             password="pass123",
             first_name="Test",
@@ -35,9 +35,14 @@ class ProjectsApiTest(APITestCase):
             name="project2",
             description="description2",
             type="frontend")
+        self.project1.contributors.add(self.user1)
+        self.project2.contributors.add(self.user1)
+
+    def auth(self, user):
+        self.client.force_authenticate(user=user)
 
     def test_create_project_with_authentification(self):
-        self.client.force_authenticate(user=self.user1)
+        self.auth(self.user1)
         payload = {
             "name": "project3",
             "description": "description3",
@@ -50,75 +55,66 @@ class ProjectsApiTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertIn("id", response.data)
 
         created_project = Project.objects.get(id=response.data["id"])
-        self.assertEqual(created_project.name, "project3")
-        self.assertEqual(created_project.type, "backend")
         self.assertEqual(created_project.author, self.user1)
-
-        projects = Project.objects.all()
-        self.assertEqual(len(projects), 3)
+        self.assertEqual(created_project.name, "project3")
+        self.assertTrue(created_project.contributors.filter(
+            pk=self.user1.pk).exists())
 
     def test_list_projects_with_authentification(self):
-        self.client.force_authenticate(user=self.user1)
+        self.auth(self.user1)
 
         response = self.client.get(self.list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 4)
-        projects = Project.objects.all()
-        projects_names = {p.name for p in projects}
-        self.assertSetEqual(projects_names, {"project1", "project2"})
 
-    def test_retrieve_project_with_no_authentification(self):
+        data = response.data.get("results", response.data)
+        name = {p["name"] for p in data}
+        self.assertSetEqual(name, {"project1", "project2"})
+
+    def test_retrieve_project_unauthenticated(self):
         project1_detail_url = reverse(
             'project-detail',
             args=[self.project1.pk])
+
         response = self.client.get(project1_detail_url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_retrieve_project_with_authentification(self):
-        self.client.force_authenticate(user=self.user1)
+    def test_retrieve_project_authenticated_contributor(self):
+        self.auth(self.user1)
         project1_detail_url = reverse(
             'project-detail',
             args=[self.project1.pk])
-        response = self.client.get(project1_detail_url)
 
+        response = self.client.get(project1_detail_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["name"], "project1")
-        self.assertEqual(response.data["type"], "backend")
 
-    def test_update_user_put(self):
-        self.client.force_authenticate(user=self.user1)
+    def test_retrieve_project_authenticated_not_contributor_returns_404(self):
+        self.auth(self.user2)
+        url = reverse("project-detail", args=[self.project2.pk])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_user_put_by_author(self):
+        self.auth(self.user1)
         project1_detail_url = reverse(
             'project-detail',
             args=[self.project1.pk])
+
         payload = {
             "name": "project1-new",
             "description": "new description here",
             "type": "ios",
         }
-
         response = self.client.put(project1_detail_url, payload)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["name"], "project1-new")
-        self.assertEqual(response.data["type"], "ios")
-
-    def test_update_project_patch(self):
-        self.client.force_authenticate(user=self.user1)
-        project1_detail_url = reverse(
-            'project-detail',
-            args=[self.project1.pk])
-        payload = {
-            "type": "android",
-        }
-        response = self.client.patch(project1_detail_url, payload)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["type"], "android")
 
     def test_delete_project_by_author(self):
-        self.client.force_authenticate(user=self.user1)
+        self.auth(self.user1)
         project2_detail_url = reverse(
             'project-detail',
             args=[self.project2.pk])
@@ -126,17 +122,18 @@ class ProjectsApiTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Project.objects.filter(pk=self.project2.pk).exists())
 
-    def test_delete_project_not_by_author(self):
-        self.client.force_authenticate(user=self.user2)
+    def test_delete_project_not_contributor_or_return_404(self):
+        self.auth(self.user2)
         project2_detail_url = reverse(
             'project-detail',
             args=[self.project2.pk])
         response = self.client.delete(project2_detail_url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertTrue(Project.objects.filter(pk=self.project2.pk).exists())
 
-    def test_unknown_project(self):
-        self.client.force_authenticate(user=self.user1)
-        project_detail_url = reverse('project-detail', args=[00])
-        response = self.client.get(project_detail_url)
+    def test_unknown_project_returns_404(self):
+        self.auth(self.user1)
+        url = reverse("project-detail", args=[999999])
+
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

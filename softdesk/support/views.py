@@ -4,7 +4,7 @@ from rest_framework import permissions, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied
 
 from authentication.serializers import CustomUserSerializer
 from .models import Project, Issue, Comment
@@ -25,19 +25,22 @@ class IsProjectAuthor(permissions.BasePermission):
         project_id = view.kwargs.get('project_id')
         if not project_id:
             return False
-
-        try:
-            project = Project.objects.get(id=project_id)
-            return project.author == request.user
-        except Project.DoesNotExist:
-            return False
+        return Project.objects.filter(id=project_id,
+                                      author=request.user).exists()
 
 
 class ProjectViewSet(ModelViewSet):
     """ ViewSet for viewing and editing project """
-    queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return (
+            Project.objects
+            .filter(contributors=self.request.user)
+            .select_related("author")
+            .prefetch_related("contributors")
+        )
 
     def get_permissions(self):
         """ Return permissions based on action """
@@ -59,9 +62,15 @@ class ProjectContributorViewSet(ModelViewSet):
     lookup_field = "pk"
     lookup_value_regex = r"\d+"
 
+    def get_project(self):
+        return get_object_or_404(
+            Project.objects.filter(contributors=self.request.user),
+            id=self.kwargs["project_id"]
+        )
+
     def get_queryset(self):
         """ Restrict the queryset based on project contributors """
-        project = get_object_or_404(Project, id=self.kwargs['project_id'])
+        project = self.get_project()
         return project.contributors.all()
 
     def get_permissions(self):
@@ -74,14 +83,19 @@ class ProjectContributorViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs['project_id'])
+
         user_id = request.data.get('user_id')
         user = get_object_or_404(User, id=user_id)
-        project.contributors.add(user)
+
+        if not project.contributors.filter(pk=user.pk).exists():
+            project.contributors.add(user)
+
         serializer = self.get_serializer(user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, id=kwargs['project_id'])
+        project = get_object_or_404(Project, id=kwargs['project_id'],
+                                    author=request.user)
         user = get_object_or_404(User, id=kwargs['pk'])
         project.contributors.remove(user)
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -98,7 +112,10 @@ class IssueViewSet(ModelViewSet):
         if not project_id:
             return Issue.objects.none()
 
-        return Issue.objects.filter(project__id=project_id)
+        return (Issue.objects
+                .filter(project__id=project_id,
+                        project__contributors=self.request.user)
+                .select_related('author', 'assigned_to', 'project'))
 
     def get_permissions(self):
         """ Return permissions based on action """
@@ -125,10 +142,10 @@ class IssueViewSet(ModelViewSet):
         if project is None:
             raise NotFound("Project does not exist")
 
-        if self.request.user not in project.contributors.all():
-            raise permissions.exceptions.PermissionDenied("You are not a "
-                                                          "contributor to "
-                                                          "this project.")
+        if not project.contributors.filter(pk=self.request.user.pk).exists():
+            raise PermissionDenied(
+                "You are not a contributor to this project."
+            )
         serializer.save(author=self.request.user, project=project)
 
 
@@ -149,18 +166,21 @@ class CommentViewSet(ModelViewSet):
         """ Restrict the queryset based on action """
         project_id = self.kwargs.get('project_id')
         issue_id = self.kwargs.get('issue_id')
-        return Comment.objects.filter(
-            issue__id=issue_id,
-            issue__project__id=project_id,
-            issue__project__contributors=self.request.user
-        )
+        return (Comment.objects
+                .filter(
+                    issue__id=issue_id,
+                    issue__project__id=project_id,
+                    issue__project__contributors=self.request.user)
+                .select_related('author', 'issue', 'issue__project'))
 
     def perform_create(self, serializer):
         """ Create a new comment with author as automatically """
         issue_id = self.kwargs.get('issue_id')
         issue = get_object_or_404(Issue, id=issue_id)
-        if self.request.user not in issue.project.contributors.all():
-            raise permissions.exceptions.PermissionDenied("You are not a "
-                                                          "contributor to "
-                                                          "this project.")
+        if not (issue.project.contributors
+                .filter(pk=self.request.user.pk)
+                .exists()):
+            raise PermissionDenied(
+                "You are not a contributor to this project."
+            )
         serializer.save(author=self.request.user, issue=issue)
