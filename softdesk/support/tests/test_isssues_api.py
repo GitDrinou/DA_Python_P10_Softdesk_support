@@ -57,7 +57,6 @@ class IssueApiTests(APITestCase):
             'priority': 'high',
             'type': 'feature',
             'status': 'todo',
-            'project': self.project.pk,
             'comments': [],
         }
         response = self.client.post(url, payload, format='json')
@@ -74,7 +73,6 @@ class IssueApiTests(APITestCase):
             'priority': 'high',
             'type': 'feature',
             'status': 'todo',
-            'project': self.project.pk,
             'comments': [],
         }
         response = self.client.post(url, payload, format='json')
@@ -92,7 +90,6 @@ class IssueApiTests(APITestCase):
             'priority': 'low',
             'type': 'task',
             'status': 'todo',
-            'project': self.project.pk,
             'author': self.author.pk,
             'comments': [],
         }

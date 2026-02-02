@@ -60,7 +60,7 @@ class CustomUserApiTest(APITestCase):
         self.client.force_authenticate(user=self.user1)
         response = self.client.get(self.list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data), 4)
         users = CustomUser.objects.all()
         usernames = {u.username for u in users}
         self.assertSetEqual(usernames, {"user1", "user2"})

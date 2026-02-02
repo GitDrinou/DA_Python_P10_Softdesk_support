@@ -98,7 +98,7 @@ class IssueViewSet(ModelViewSet):
         if not project_id:
             return Issue.objects.none()
 
-        return Issue.objects.filter(projectid=project_id)
+        return Issue.objects.filter(project__id=project_id)
 
     def get_permissions(self):
         """ Return permissions based on action """
@@ -136,7 +136,6 @@ class CommentViewSet(ModelViewSet):
     """ ViewSet for viewing and editing comment """
     serializer_class = CommentSerializer
     lookup_field = "pk"
-    lookup_value_regex = r"\d+"
 
     def get_permissions(self):
         """ Return permissions based on action """

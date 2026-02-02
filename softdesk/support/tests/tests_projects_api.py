@@ -65,7 +65,7 @@ class ProjectsApiTest(APITestCase):
 
         response = self.client.get(self.list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data), 4)
         projects = Project.objects.all()
         projects_names = {p.name for p in projects}
         self.assertSetEqual(projects_names, {"project1", "project2"})

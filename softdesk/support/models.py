@@ -22,6 +22,9 @@ class Project(models.Model):
     contributors = models.ManyToManyField(User,
                                           related_name='projects', blank=True)
 
+    class Meta:
+        ordering = ["id"]
+
     def __str__(self):
         return f'{self.name} ({self.type}) du {self.created_time}'
 
