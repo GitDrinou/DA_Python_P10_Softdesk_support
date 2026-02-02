@@ -4,6 +4,7 @@ from rest_framework import permissions, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.exceptions import NotFound
 
 from authentication.serializers import CustomUserSerializer
 from .models import Project, Issue, Comment
@@ -89,8 +90,15 @@ class ProjectContributorViewSet(ModelViewSet):
 class IssueViewSet(ModelViewSet):
     """ ViewSet for viewing and editing issue """
     serializer_class = IssueSerializer
-    lookup_field = "pk"
-    lookup_value_regex = r"\d+"
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """ Restrict the queryset based on action """
+        project_id = self.kwargs.get('project_id')
+        if not project_id:
+            return Issue.objects.none()
+
+        return Issue.objects.filter(projectid=project_id)
 
     def get_permissions(self):
         """ Return permissions based on action """
@@ -100,18 +108,28 @@ class IssueViewSet(ModelViewSet):
             permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
 
-    def get_queryset(self):
-        """ Restrict the queryset based on action """
-        return Issue.objects.filter(project__contributors=self.request.user)
+    def get_serializer_context(self):
+        """ Project injection to serializer for validation (create) """
+        context = super().get_serializer_context()
+        project_id = self.kwargs.get('project_id')
+        if project_id:
+            try:
+                context['project'] = get_object_or_404(Project, id=project_id)
+            except Project.DoesNotExist:
+                context['project'] = None
+        return context
 
     def perform_create(self, serializer):
         """ Create a new issue with an author automatically"""
-        project = serializer.validated_data['project']
+        project = self.get_serializer_context().get("project")
+        if project is None:
+            raise NotFound("Project does not exist")
+
         if self.request.user not in project.contributors.all():
             raise permissions.exceptions.PermissionDenied("You are not a "
                                                           "contributor to "
                                                           "this project.")
-        serializer.save(author=self.request.user)
+        serializer.save(author=self.request.user, project=project)
 
 
 class CommentViewSet(ModelViewSet):

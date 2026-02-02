@@ -42,6 +42,37 @@ class IssueSerializer(serializers.ModelSerializer):
             'created_time',
             'comments'
         ]
+        read_only_fields = ['author', 'created_time', 'project']
+
+    def validate(self, attrs):
+        """ Validate the assignee to be contributors to the project
+            Args:
+                attrs (dict): attributes of the issue model
+        """
+        if "assigned_to" not in attrs:
+            return attrs
+
+        assigned_to = attrs.get["assigned_to"]
+        if assigned_to is None:
+            return attrs
+
+        if self.instance is not None:
+            project = self.instance.project
+        else:
+            project = self.context.get("project")
+
+        if project is None:
+            raise serializers.ValidationError(
+                "Project not found to validate the assignment"
+            )
+
+        if assigned_to not in project.contributors.all():
+            raise serializers.ValidationError(
+                {"assigned_to": "The assignee user must be a project "
+                                "contributor"}
+            )
+
+        return attrs
 
 
 class CommentSerializer(serializers.ModelSerializer):

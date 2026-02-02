@@ -22,10 +22,17 @@ from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, \
     TokenRefreshView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication
 
 from authentication.views import CustomUserViewSet
 from support.views import ProjectViewSet, ProjectContributorViewSet, \
     IssueViewSet, CommentViewSet
+
+
+class SwaggerProtectedView(SpectacularSwaggerView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
 
 router = routers.DefaultRouter()
 router.register(r'users', CustomUserViewSet, basename='user')
@@ -45,11 +52,9 @@ urlpatterns = [
          name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(),
          name='token_refresh'),
-    path('api/schema/', SpectacularAPIView.as_view(
-        permission_classes=[IsAuthenticated]), name='schema'),
-    path('api/docs/', SpectacularSwaggerView.as_view(
-        url_name='schema',
-        permission_classes=[IsAuthenticated]), name='swagger-ui'),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'),
+         name='swagger-ui'),
     path('', include(router.urls)),
     path('logout/', LogoutView.as_view(), name='logout'),
 ]
