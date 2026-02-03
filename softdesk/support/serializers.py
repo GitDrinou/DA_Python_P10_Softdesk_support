@@ -52,7 +52,7 @@ class IssueSerializer(serializers.ModelSerializer):
         if "assigned_to" not in attrs:
             return attrs
 
-        assigned_to = attrs.get["assigned_to"]
+        assigned_to = attrs.get("assigned_to")
         if assigned_to is None:
             return attrs
 
@@ -66,7 +66,8 @@ class IssueSerializer(serializers.ModelSerializer):
                 "Project not found to validate the assignment"
             )
 
-        if assigned_to not in project.contributors.all():
+        if assigned_to and not project.contributors.filter(
+                pk=assigned_to).exists():
             raise serializers.ValidationError(
                 {"assigned_to": "The assignee user must be a project "
                                 "contributor"}

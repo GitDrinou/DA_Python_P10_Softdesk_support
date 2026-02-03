@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.exceptions import NotFound, PermissionDenied
+from django.db.models import Prefetch
 
 from authentication.serializers import CustomUserSerializer
 from .models import Project, Issue, Comment
@@ -39,7 +40,8 @@ class ProjectViewSet(ModelViewSet):
             Project.objects
             .filter(contributors=self.request.user)
             .select_related("author")
-            .prefetch_related("contributors")
+            .prefetch_related(Prefetch("contributors",
+                                       queryset=User.objects.only("id")))
         )
 
     def get_permissions(self):
@@ -115,7 +117,8 @@ class IssueViewSet(ModelViewSet):
         return (Issue.objects
                 .filter(project__id=project_id,
                         project__contributors=self.request.user)
-                .select_related('author', 'assigned_to', 'project'))
+                .select_related('author', 'assigned_to', 'project')
+                .prefetch_related('comments'))
 
     def get_permissions(self):
         """ Return permissions based on action """
