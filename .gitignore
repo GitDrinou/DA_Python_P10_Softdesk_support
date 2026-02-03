@@ -2,3 +2,6 @@
 .DS_Store
 Pipfile.lock
 __pycache__/
+docs/dependency-check-report.html
+docs/zap-report.html
+zap.yaml
