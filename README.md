@@ -47,9 +47,6 @@ authentication, permissions, and core features.
 To access to the documentation:
 1. Launch the server on terminal `python manage.py runserver`
 2. go to the documentation at http://127.0.0.1:8000/api/docs/
-3. generate an access Token with your user credentials and copy-paste the 
-   token on the Bearer section when you click on the Authorize button at the 
-   top-right documentation page.
 
 Now you can test the different endpoints.
 
