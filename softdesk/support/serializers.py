@@ -67,7 +67,7 @@ class IssueSerializer(serializers.ModelSerializer):
             )
 
         if assigned_to and not project.contributors.filter(
-                pk=assigned_to).exists():
+                pk=assigned_to.pk).exists():
             raise serializers.ValidationError(
                 {"assigned_to": "The assignee user must be a project "
                                 "contributor"}

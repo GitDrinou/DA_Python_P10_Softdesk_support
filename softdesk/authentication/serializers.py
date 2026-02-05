@@ -41,7 +41,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         """ Validate the user age to be more than 15 years old """
         if value < 15:
             raise serializers.ValidationError(
-                "You must be at least 15 years old to create an account"
+                "You must be at least 15 years old to create an account."
             )
 
         return value
