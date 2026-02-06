@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework import permissions, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -29,9 +30,16 @@ class IsProjectAuthor(permissions.BasePermission):
         return Project.objects.filter(id=project_id,
                                       author=request.user).exists()
 
-
+@extend_schema_view(
+    list=extend_schema(summary="Projects list",tags=["Project"]),
+    create=extend_schema(summary="Create a project", tags=["Project"]),
+    retrieve=extend_schema(summary="Get project details", tags=["Project"]),
+    update=extend_schema(summary="Update a project", tags=["Project"]),
+    destroy=extend_schema(summary="Delete a project", tags=["Project"]),
+)
 class ProjectViewSet(ModelViewSet):
     """ ViewSet for viewing and editing project """
+    http_method_names = ['get', 'post', 'put', 'delete']
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated]
 
@@ -58,8 +66,17 @@ class ProjectViewSet(ModelViewSet):
         project.contributors.add(self.request.user)
 
 
+@extend_schema_view(
+    list=extend_schema(summary="Contributors list", tags=["Contributors"]),
+    create=extend_schema(summary="Add a contributor to a project", tags=[
+        "Contributors"]),
+    retrieve=extend_schema(summary="Get contributor details",
+                           tags=["Contributors"]),
+    destroy=extend_schema(tags=["Contributors"]),
+)
 class ProjectContributorViewSet(ModelViewSet):
     """ ViewSet for viewing and editing project contributors """
+    http_method_names = ['get', 'post', 'delete']
     serializer_class = CustomUserSerializer
     lookup_field = "pk"
     lookup_value_regex = r"\d+"
@@ -103,8 +120,16 @@ class ProjectContributorViewSet(ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema_view(
+    list=extend_schema(summary="Issues list", tags=["Issues"]),
+    create=extend_schema(summary="Create an issue", tags=["Issues"]),
+    retrieve=extend_schema(summary="Get issue details", tags=["Issues"]),
+    update=extend_schema(summary="Update an issue", tags=["Issues"]),
+    destroy=extend_schema(summary="Delete an issue", tags=["Issues"]),
+)
 class IssueViewSet(ModelViewSet):
     """ ViewSet for viewing and editing issue """
+    http_method_names = ['get', 'post', 'put', 'delete']
     serializer_class = IssueSerializer
     permission_classes = [IsAuthenticated]
 
@@ -152,8 +177,16 @@ class IssueViewSet(ModelViewSet):
         serializer.save(author=self.request.user, project=project)
 
 
+@extend_schema_view(
+    list=extend_schema(summary="Comments list", tags=["Comments"]),
+    create=extend_schema(summary="Create a comment", tags=["Comments"]),
+    retrieve=extend_schema(summary="Get comment details", tags=["Comments"]),
+    update=extend_schema(summary="Update a comment", tags=["Comments"]),
+    destroy=extend_schema(summary="Delete a comment", tags=["Comments"]),
+)
 class CommentViewSet(ModelViewSet):
     """ ViewSet for viewing and editing comment """
+    http_method_names = ['get', 'post', 'put', 'delete']
     serializer_class = CommentSerializer
     lookup_field = "pk"
 

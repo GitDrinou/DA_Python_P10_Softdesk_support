@@ -171,6 +171,13 @@ SPECTACULAR_SETTINGS = {
             }
         }
     },
+    'ENUM_NAME_OVERRIDES': {
+        'PathParameter': {
+            'project_id': 'int',
+            'issue_id': 'int',
+            'pk': 'int',
+        }
+    },
 }
 
 LOGIN_REDIRECT_URL = '/api/docs/'
