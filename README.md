@@ -50,7 +50,7 @@ To access to the documentation:
 
 Now you can test the different endpoints.
 
-![Swagger UI](docs/screenshot-api-docs.jpg)
+![Swagger UI](docs/screenshot_swagger_ui.jpg)
 ## Running unit tests
 To run all unit tests: `python manage.py test`
 
